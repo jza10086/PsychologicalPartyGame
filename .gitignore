@@ -1,3 +1,7 @@
 .godot/
 *.tmp
 *.log
+*.TMP
+__pycache__/
+*.pyc
+/config/

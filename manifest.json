@@ -1,0 +1,34 @@
+{
+  "manifest_version": 2,
+  "core_api_major": 4,
+  "package_version": "1.0.0",
+  "id": "godot_party_default_psychological_party",
+  "name": "GodotPartyDefault · 心理博弈",
+  "kind": "minigame",
+  "entry": "game.tscn",
+  "player_counts": [2, 3, 4, 5, 6, 7, 8],
+  "tags": [
+    "original"
+  ],
+  "dependencies": {
+    "godot_party_default_protocol": "1.0.0"
+  },
+  "adapters": [
+    {
+      "id": "standard",
+      "protocol": {
+        "id": "godot_party_default_protocol",
+        "api_major": 1,
+        "min_api_minor": 0
+      },
+      "entry": "adapter.gd"
+    }
+  ],
+  "config_schema": "settings.gd",
+  "streams": {
+    "view": {
+      "mode": "reliable",
+      "audience": "instance"
+    }
+  }
+}

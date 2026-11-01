@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bqkgmlq6gj5md"]
+
+[ext_resource type="Script" uid="uid://bg6n5yujyvth3" path="res://games/minigame/godot_party_default_psychological_party/game.gd" id="1_gict7"]
+
+[node name="Game" type="Control" unique_id=297047006]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_gict7")
