@@ -1,6 +1,8 @@
 extends Control
 ## Host-only secret state, per-player snapshots, and explicit pair voice routing.
 const Session: Script = preload("res://games/minigame/godot_party_default_psychological_party/core/session.gd")
+const Pages = preload("res://games/protocols/godot_party_default_protocol/round_pages.gd")
+var pages: Pages
 var api: PartyAPI
 var request: Dictionary
 var players: Array[Dictionary] = []
@@ -74,7 +76,10 @@ func _ready() -> void:
 	if api.is_host():
 		session = Session.new()
 		session.voice_requested.connect(_route_voice)
-	api.mark_ready()
+	pages = Pages.new()
+	var ready_error: Error = pages.prepare(self, api, request, _start_gameplay)
+	if ready_error != OK:
+		api.fail("load_failed", error_string(ready_error))
 
 func _label(parent: Node, text_value: String, font_size: int) -> Label:
 	var label: Label = Label.new()
@@ -105,6 +110,9 @@ func _toggle_microphone() -> void:
 		message_label.text = "语音状态：" + str(api.voice.get_status())
 
 func party_start() -> void:
+	pages.transport_started()
+
+func _start_gameplay() -> void:
 	running = true
 	if api.is_host():
 		var roster: Array = []
@@ -233,6 +241,6 @@ func _finish(public: Dictionary) -> void:
 			if player.player_id == row.player_id:
 				connected = player.connected
 		rows.append({"player_id": row.player_id, "rank": row.rank if connected else 0, "status": "completed" if connected else "withdrawn", "metrics": {"score": row.score}})
-	var error: Error = api.finish({"request_id": request.request_id, "reason": "completed", "rankings": rows, "columns": [{"key": "score", "title": "总收益", "format": "integer"}], "game_data": {"pairs": public.results}})
+	var error: Error = pages.present({"request_id": request.request_id, "reason": "completed", "rankings": rows, "columns": [{"key": "score", "title": "总收益", "format": "integer"}], "game_data": {"pairs": public.results}})
 	if error != OK:
 		api.fail("result_rejected", error_string(error))

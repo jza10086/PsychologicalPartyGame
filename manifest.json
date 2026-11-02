@@ -5,6 +5,7 @@
   "id": "godot_party_default_psychological_party",
   "name": "GodotPartyDefault · 心理博弈",
   "kind": "minigame",
+  "introduction": "与本轮搭档商议后分别选择行动，根据双方的选择累计收益，最终按总收益排名。",
   "entry": "game.tscn",
   "player_counts": [2, 3, 4, 5, 6, 7, 8],
   "tags": [
@@ -21,7 +22,8 @@
         "api_major": 1,
         "min_api_minor": 0
       },
-      "entry": "adapter.gd"
+      "introduction": "与本轮搭档商议后分别选择行动，根据双方的选择累计收益，最终按总收益排名。",
+  "entry": "adapter.gd"
     }
   ],
   "config_schema": "settings.gd",
