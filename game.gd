@@ -35,35 +35,16 @@ func party_setup(value: PartyAPI, config: Dictionary) -> void:
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_build_ui()
 	if api == null:
-		push_error("请从 GodotParty 大厅启动小游戏")
+		# F6 previews only the meeting space and HUD, without voice or a simulated match.
+		voice_button.disabled = true
+		status_label.text = "画面预览"
+		detail_label.text = "合作 · 还是背叛"
 		return
 	if request.get("mode") != "standard":
 		api.fail("unsupported_request", "心理博弈仅支持普通局")
 		return
-	var background: ColorRect = ColorRect.new()
-	background.color = Color("#152b39")
-	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(background)
-	var center: CenterContainer = CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-	var column: VBoxContainer = VBoxContainer.new()
-	column.custom_minimum_size.x = 900
-	column.add_theme_constant_override("separation", 24)
-	center.add_child(column)
-	title_label = _label(column, "心理博弈 · 合作还是背叛", 42)
-	_label(column, "每位玩家都会遇见其他人一次。选择一经提交便锁定。\n合作 / 合作：3 / 3；背叛 / 合作：5 / 0；背叛 / 背叛：1 / 1。\n超时默认背叛，整局结束统一揭晓。", 24)
-	status_label = _label(column, "等待所有玩家准备", 28)
-	detail_label = _label(column, "", 24)
-	var row: HBoxContainer = HBoxContainer.new()
-	column.add_child(row)
-	cooperate_button = _button(row, "合作", _choose.bind("cooperate"))
-	defect_button = _button(row, "背叛", _choose.bind("defect"))
-	cooperate_button.disabled = true
-	defect_button.disabled = true
-	voice_button = _button(column, "开启麦克风（仅当前搭档可听）", _toggle_microphone)
-	message_label = _label(column, "可保持静音游玩；麦克风需要系统设置中的授权。", 20)
 	voice_bus = "party." + api.scope_id + ".psychological." + str(api.net.get_multiplayer_api().get_unique_id())
 	AudioServer.add_bus()
 	AudioServer.set_bus_name(AudioServer.bus_count - 1, voice_bus)
@@ -81,10 +62,70 @@ func _ready() -> void:
 	if ready_error != OK:
 		api.fail("load_failed", error_string(ready_error))
 
+## Presentation only; standalone preview never starts voice or match state.
+func _build_ui() -> void:
+	var background: ColorRect = ColorRect.new()
+	background.color = Color("#152b39")
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(background)
+	add_to_group(&"party_minimal_hud")
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# The meeting space fills the screen; only the current pairing occupies its center.
+	var meeting: Control = Control.new()
+	meeting.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	meeting.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	meeting.draw.connect(func() -> void:
+		var center: Vector2 = meeting.size * 0.5
+		meeting.draw_circle(center, 260, Color("1b3945"))
+		meeting.draw_arc(center, 280, 0, TAU, 96, Color("39716e"), 2, true)
+		for side: float in [-1.0, 1.0]:
+			var seat: Vector2 = center + Vector2(side * 350, 0)
+			meeting.draw_circle(seat, 72, Color("284a54"))
+			meeting.draw_circle(seat, 52, Color("73c5b0")))
+	meeting.resized.connect(meeting.queue_redraw)
+	add_child(meeting)
+	var header: VBoxContainer = VBoxContainer.new()
+	header.position = Vector2(28, 24)
+	add_child(header)
+	title_label = _label(header, "心理博弈", 26)
+	status_label = _label(header, "等待所有玩家准备", 22)
+	var center: CenterContainer = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(center)
+	detail_label = _label(center, "", 28)
+	var column: VBoxContainer = VBoxContainer.new()
+	add_child(column)
+	column.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	column.offset_left = 28
+	column.offset_top = -220
+	column.offset_bottom = -28
+	column.add_theme_constant_override("separation", 10)
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	column.add_child(row)
+	var guide: Label = _label(self, "合作 / 合作：3 / 3 · 背叛 / 合作：5 / 0\n背叛 / 背叛：1 / 1 · 超时默认背叛\nEsc：菜单", 20)
+	guide.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	guide.offset_left = -650
+	guide.offset_top = -120
+	guide.offset_right = -28
+	guide.offset_bottom = -28
+	guide.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	cooperate_button = _button(row, "合作", _choose.bind("cooperate"))
+	defect_button = _button(row, "背叛", _choose.bind("defect"))
+	cooperate_button.disabled = true
+	defect_button.disabled = true
+	voice_button = _button(column, "开启麦克风（仅当前搭档可听）", _toggle_microphone)
+	message_label = _label(column, "可保持静音游玩；麦克风需要系统设置中的授权。", 20)
+
 func _label(parent: Node, text_value: String, font_size: int) -> Label:
 	var label: Label = Label.new()
 	label.text = text_value
 	label.add_theme_font_size_override("font_size", font_size)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.add_theme_color_override("font_color", Color("f4f1e8"))
+	label.add_theme_color_override("font_outline_color", Color("12252d"))
+	label.add_theme_constant_override("outline_size", 5)
 	parent.add_child(label)
 	return label
 
@@ -191,7 +232,7 @@ func _participant(id: String) -> bool:
 	return false
 
 func _choose(choice: String) -> void:
-	if not running or local_id.is_empty() or not snapshot.get("can_submit", false):
+	if not running or api.input.input_blocked or local_id.is_empty() or not snapshot.get("can_submit", false):
 		return
 	api.net.send_to_host(&"choice", {"choice": choice, "run_id": snapshot.run_id, "round_index": snapshot.round_index})
 	cooperate_button.disabled = true
