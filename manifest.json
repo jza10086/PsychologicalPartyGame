@@ -7,7 +7,15 @@
   "kind": "minigame",
   "introduction": "与本轮搭档商议后分别选择行动，根据双方的选择累计收益，最终按总收益排名。",
   "entry": "game.tscn",
-  "player_counts": [2, 3, 4, 5, 6, 7, 8],
+  "player_counts": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
   "tags": [
     "original"
   ],
@@ -23,7 +31,7 @@
         "min_api_minor": 0
       },
       "introduction": "与本轮搭档商议后分别选择行动，根据双方的选择累计收益，最终按总收益排名。",
-  "entry": "adapter.gd"
+      "entry": "adapter.gd"
     }
   ],
   "config_schema": "settings.gd",
@@ -31,6 +39,15 @@
     "view": {
       "mode": "reliable",
       "audience": "instance"
+    }
+  },
+  "localization": {
+    "supported_locales": [
+      "zh_Hans"
+    ],
+    "fallback_locale": "zh_Hans",
+    "translations": {
+      "zh_Hans": "i18n/zh_Hans.po"
     }
   }
 }

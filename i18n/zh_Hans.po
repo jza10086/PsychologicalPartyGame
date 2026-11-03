@@ -1,0 +1,17 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_Hans\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "GodotPartyDefault · 心理博弈"
+msgstr "GodotPartyDefault · 心理博弈"
+
+msgid "与本轮搭档商议后分别选择行动，根据双方的选择累计收益，最终按总收益排名。"
+msgstr "与本轮搭档商议后分别选择行动，根据双方的选择累计收益，最终按总收益排名。"
+
+msgid "每轮沟通与选择秒数"
+msgstr "每轮沟通与选择秒数"
+
+msgid "游戏规则"
+msgstr "游戏规则"
