@@ -1,8 +1,282 @@
-[gd_scene format=3 uid="uid://bqkgmlq6gj5md"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://bg6n5yujyvth3" path="res://games/minigame/godot_party_default_psychological_party/game.gd" id="1_gict7"]
+[ext_resource type="Script" path="res://games/minigame/godot_party_default_psychological_party/game.gd" id="1_gict7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gict7"]
+bg_color = Color(0.105882354, 0.22352941, 0.27058825, 1)
+corner_radius_top_left = 260
+corner_radius_top_right = 260
+corner_radius_bottom_right = 260
+corner_radius_bottom_left = 260
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3baxg"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.22352941, 0.44313726, 0.43137255, 1)
+corner_radius_top_left = 280
+corner_radius_top_right = 280
+corner_radius_bottom_right = 280
+corner_radius_bottom_left = 280
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_spppo"]
+bg_color = Color(0.15686275, 0.2901961, 0.32941177, 1)
+corner_radius_top_left = 72
+corner_radius_top_right = 72
+corner_radius_bottom_right = 72
+corner_radius_bottom_left = 72
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kghhr"]
+bg_color = Color(0.4509804, 0.77254903, 0.6901961, 1)
+corner_radius_top_left = 52
+corner_radius_top_right = 52
+corner_radius_bottom_right = 52
+corner_radius_bottom_left = 52
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_466ya"]
+bg_color = Color(0.15686275, 0.2901961, 0.32941177, 1)
+corner_radius_top_left = 72
+corner_radius_top_right = 72
+corner_radius_bottom_right = 72
+corner_radius_bottom_left = 72
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_71506"]
+bg_color = Color(0.4509804, 0.77254903, 0.6901961, 1)
+corner_radius_top_left = 52
+corner_radius_top_right = 52
+corner_radius_bottom_right = 52
+corner_radius_bottom_left = 52
+corner_detail = 20
 
 [node name="Game" type="Control" unique_id=297047006]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 script = ExtResource("1_gict7")
+
+[node name="GameCanvas" type="CanvasLayer" parent="." unique_id=1268517356]
+layer = -4
+
+[node name="Background" type="ColorRect" parent="GameCanvas" unique_id=679935113]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.08235294, 0.16862746, 0.22352941, 1)
+
+[node name="Meeting" type="Control" parent="GameCanvas" unique_id=343970632]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Circle" type="Panel" parent="GameCanvas/Meeting" unique_id=445112583]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -260.0
+offset_right = 260.0
+offset_bottom = 260.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gict7")
+
+[node name="Rim" type="Panel" parent="GameCanvas/Meeting" unique_id=1122451898]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -280.0
+offset_right = 280.0
+offset_bottom = 280.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_3baxg")
+
+[node name="LeftSeat" type="Control" parent="GameCanvas/Meeting" unique_id=1039784392]
+anchors_preset = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_right = -350.0
+mouse_filter = 2
+
+[node name="Seat" type="Panel" parent="GameCanvas/Meeting/LeftSeat" unique_id=96440349]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -72.0
+offset_top = -72.0
+offset_right = 72.0
+offset_bottom = 72.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_spppo")
+
+[node name="Player" type="Panel" parent="GameCanvas/Meeting/LeftSeat" unique_id=1039570305]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -52.0
+offset_right = 52.0
+offset_bottom = 52.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_kghhr")
+
+[node name="RightSeat" type="Control" parent="GameCanvas/Meeting" unique_id=675947419]
+anchors_preset = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 350.0
+offset_right = 350.0
+mouse_filter = 2
+
+[node name="Seat" type="Panel" parent="GameCanvas/Meeting/RightSeat" unique_id=1624409706]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -72.0
+offset_top = -72.0
+offset_right = 72.0
+offset_bottom = 72.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_466ya")
+
+[node name="Player" type="Panel" parent="GameCanvas/Meeting/RightSeat" unique_id=1315276162]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -52.0
+offset_right = 52.0
+offset_bottom = 52.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_71506")
+
+[node name="GameHUD" type="CanvasLayer" parent="." unique_id=1100593989]
+layer = -1
+
+[node name="VBoxContainer1" type="VBoxContainer" parent="GameHUD" unique_id=113310815]
+offset_left = 28.0
+offset_top = 24.0
+offset_right = 28.0
+offset_bottom = 24.0
+
+[node name="TitleLabel" type="Label" parent="GameHUD/VBoxContainer1" unique_id=2100475579]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95686275, 0.94509804, 0.9098039, 1)
+theme_override_colors/font_outline_color = Color(0.07058824, 0.14509805, 0.1764706, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 26
+text = "心理博弈"
+
+[node name="StatusLabel" type="Label" parent="GameHUD/VBoxContainer1" unique_id=1110687068]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95686275, 0.94509804, 0.9098039, 1)
+theme_override_colors/font_outline_color = Color(0.07058824, 0.14509805, 0.1764706, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 22
+text = "第 2 / 5 轮 · 剩余 30 秒"
+
+[node name="CenterContainer2" type="CenterContainer" parent="GameHUD" unique_id=217059246]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="DetailLabel" type="Label" parent="GameHUD/CenterContainer2" unique_id=971500981]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95686275, 0.94509804, 0.9098039, 1)
+theme_override_colors/font_outline_color = Color(0.07058824, 0.14509805, 0.1764706, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 28
+text = "当前搭档：小林"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="GameHUD" unique_id=212741253]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = -220.0
+offset_bottom = -28.0
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer1" type="HBoxContainer" parent="GameHUD/VBoxContainer3" unique_id=136494826]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CooperateButton" type="Button" parent="GameHUD/VBoxContainer3/HBoxContainer1" unique_id=1992060247]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 64)
+layout_mode = 2
+disabled = true
+text = "合作"
+
+[node name="DefectButton" type="Button" parent="GameHUD/VBoxContainer3/HBoxContainer1" unique_id=1953056288]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 64)
+layout_mode = 2
+disabled = true
+text = "背叛"
+
+[node name="VoiceButton" type="Button" parent="GameHUD/VBoxContainer3" unique_id=149897015]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 64)
+layout_mode = 2
+text = "开启麦克风（仅当前搭档可听）"
+
+[node name="MessageLabel" type="Label" parent="GameHUD/VBoxContainer3" unique_id=2136917615]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95686275, 0.94509804, 0.9098039, 1)
+theme_override_colors/font_outline_color = Color(0.07058824, 0.14509805, 0.1764706, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+text = "可保持静音游玩；麦克风需要系统设置中的授权。"
+
+[node name="Label4" type="Label" parent="GameHUD" unique_id=899386177]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -650.0
+offset_top = -120.0
+offset_right = -28.0
+offset_bottom = -28.0
+theme_override_colors/font_color = Color(0.95686275, 0.94509804, 0.9098039, 1)
+theme_override_colors/font_outline_color = Color(0.07058824, 0.14509805, 0.1764706, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+text = "合作 / 合作：3 / 3 · 背叛 / 合作：5 / 0
+背叛 / 背叛：1 / 1 · 超时默认背叛
+Esc：菜单"
+horizontal_alignment = 2

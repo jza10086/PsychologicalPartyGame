@@ -15,3 +15,9 @@ msgstr "每轮沟通与选择秒数"
 
 msgid "游戏规则"
 msgstr "游戏规则"
+
+msgid "hud.round"
+msgstr "第 {round} / {total} 轮 · 剩余 {time} 秒{spectator}"
+
+msgid "hud.partner"
+msgstr "当前搭档：{player}"

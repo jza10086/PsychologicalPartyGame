@@ -15,13 +15,13 @@ var groups: Dictionary = {}
 var pairs: Dictionary = {}
 var voice_bus: String = ""
 var microphone: bool = false
-var title_label: Label
-var status_label: Label
-var detail_label: Label
-var cooperate_button: Button
-var defect_button: Button
-var voice_button: Button
-var message_label: Label
+@onready var title_label: Label = %TitleLabel
+@onready var status_label: Label = %StatusLabel
+@onready var detail_label: Label = %DetailLabel
+@onready var cooperate_button: Button = %CooperateButton
+@onready var defect_button: Button = %DefectButton
+@onready var voice_button: Button = %VoiceButton
+@onready var message_label: Label = %MessageLabel
 
 func party_setup(value: PartyAPI, config: Dictionary) -> void:
 	api = value
@@ -34,8 +34,11 @@ func party_setup(value: PartyAPI, config: Dictionary) -> void:
 	api.players_changed.connect(_players_changed)
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_build_ui()
+	cooperate_button.pressed.connect(_choose.bind("cooperate"))
+	defect_button.pressed.connect(_choose.bind("defect"))
+	voice_button.pressed.connect(_toggle_microphone)
+	status_label.text = "等待所有玩家准备"
+	detail_label.text = ""
 	if api == null:
 		# F6 previews only the meeting space and HUD, without voice or a simulated match.
 		voice_button.disabled = true
@@ -61,81 +64,6 @@ func _ready() -> void:
 	var ready_error: Error = pages.prepare(self, api, request, _start_gameplay)
 	if ready_error != OK:
 		api.fail("load_failed", error_string(ready_error))
-
-## Presentation only; standalone preview never starts voice or match state.
-func _build_ui() -> void:
-	var background: ColorRect = ColorRect.new()
-	background.color = Color("#152b39")
-	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(background)
-	add_to_group(&"party_minimal_hud")
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# The meeting space fills the screen; only the current pairing occupies its center.
-	var meeting: Control = Control.new()
-	meeting.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	meeting.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	meeting.draw.connect(func() -> void:
-		var center: Vector2 = meeting.size * 0.5
-		meeting.draw_circle(center, 260, Color("1b3945"))
-		meeting.draw_arc(center, 280, 0, TAU, 96, Color("39716e"), 2, true)
-		for side: float in [-1.0, 1.0]:
-			var seat: Vector2 = center + Vector2(side * 350, 0)
-			meeting.draw_circle(seat, 72, Color("284a54"))
-			meeting.draw_circle(seat, 52, Color("73c5b0")))
-	meeting.resized.connect(meeting.queue_redraw)
-	add_child(meeting)
-	var header: VBoxContainer = VBoxContainer.new()
-	header.position = Vector2(28, 24)
-	add_child(header)
-	title_label = _label(header, "心理博弈", 26)
-	status_label = _label(header, "等待所有玩家准备", 22)
-	var center: CenterContainer = CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(center)
-	detail_label = _label(center, "", 28)
-	var column: VBoxContainer = VBoxContainer.new()
-	add_child(column)
-	column.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-	column.offset_left = 28
-	column.offset_top = -220
-	column.offset_bottom = -28
-	column.add_theme_constant_override("separation", 10)
-	var row: HBoxContainer = HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	column.add_child(row)
-	var guide: Label = _label(self, "合作 / 合作：3 / 3 · 背叛 / 合作：5 / 0\n背叛 / 背叛：1 / 1 · 超时默认背叛\nEsc：菜单", 20)
-	guide.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	guide.offset_left = -650
-	guide.offset_top = -120
-	guide.offset_right = -28
-	guide.offset_bottom = -28
-	guide.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	cooperate_button = _button(row, "合作", _choose.bind("cooperate"))
-	defect_button = _button(row, "背叛", _choose.bind("defect"))
-	cooperate_button.disabled = true
-	defect_button.disabled = true
-	voice_button = _button(column, "开启麦克风（仅当前搭档可听）", _toggle_microphone)
-	message_label = _label(column, "可保持静音游玩；麦克风需要系统设置中的授权。", 20)
-
-func _label(parent: Node, text_value: String, font_size: int) -> Label:
-	var label: Label = Label.new()
-	label.text = text_value
-	label.add_theme_font_size_override("font_size", font_size)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_color_override("font_color", Color("f4f1e8"))
-	label.add_theme_color_override("font_outline_color", Color("12252d"))
-	label.add_theme_constant_override("outline_size", 5)
-	parent.add_child(label)
-	return label
-
-func _button(parent: Node, text_value: String, callback: Callable) -> Button:
-	var button: Button = Button.new()
-	button.text = text_value
-	button.custom_minimum_size = Vector2(240, 64)
-	button.pressed.connect(callback)
-	parent.add_child(button)
-	return button
 
 func _configure_voice() -> Error:
 	return api.voice.configure_local_endpoint({"capture_requested": microphone, "transmit_requested": microphone, "receive_requested": true, "playback_bus": voice_bus})
@@ -254,9 +182,9 @@ func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 				break
 
 func _render() -> void:
-	status_label.text = "第 %d / %d 轮 · 剩余 %d 秒%s" % [int(snapshot.get("round_index", -1)) + 1, snapshot.get("round_count", 0), ceili(snapshot.get("remaining_seconds", 0)), " · 观战" if local_id.is_empty() else ""]
+	status_label.text = api.i18n.text(&"hud.round", {"round": int(snapshot.get("round_index", -1)) + 1, "total": snapshot.get("round_count", 0), "time": ceili(snapshot.get("remaining_seconds", 0)), "spectator": " · 观战" if local_id.is_empty() else ""})
 	var opponent: String = str(snapshot.get("opponent_id", ""))
-	detail_label.text = "本轮轮空，等待其他配对" if opponent.is_empty() else "当前搭档：" + _name(opponent)
+	detail_label.text = "本轮轮空，等待其他配对" if opponent.is_empty() else api.i18n.text(&"hud.partner", {"player": _name(opponent)})
 	if not str(snapshot.get("self_choice", "")).is_empty():
 		detail_label.text += " · 已锁定：" + ("合作" if snapshot.self_choice == "cooperate" else "背叛")
 	cooperate_button.disabled = not snapshot.get("can_submit", false)
