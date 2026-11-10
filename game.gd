@@ -1,5 +1,5 @@
 extends Control
-## Host-only secret state, per-player snapshots, and explicit pair voice routing.
+## Host rules and pair voice routing; reliable phase and owner-only choice changes.
 const Session: Script = preload("res://games/minigame/godot_party_default_psychological_party/core/session.gd")
 const Pages = preload("res://games/protocols/godot_party_default_protocol/round_pages.gd")
 var pages: Pages
@@ -10,7 +10,11 @@ var local_id: String = ""
 var session: RefCounted
 var snapshot: Dictionary = {}
 var running: bool = false
-var clock: float = 0.0
+var _published_public: Dictionary = {}
+var _published_private: Dictionary = {}
+var _phase_key: String = ""
+var _end_msec: int = -1
+var _choice_pending: bool = false
 var groups: Dictionary = {}
 var pairs: Dictionary = {}
 var voice_bus: String = ""
@@ -91,7 +95,7 @@ func _start_gameplay() -> void:
 		if not report.ok:
 			api.fail("rules_start", str(report.error))
 			return
-		_send_snapshots()
+		_publish_changes()
 
 func party_stop(_reason: StringName) -> void:
 	running = false
@@ -104,23 +108,23 @@ func party_stop(_reason: StringName) -> void:
 		AudioServer.remove_bus(index)
 
 func _process(delta: float) -> void:
-	if not running or not api.is_host():
+	if not running:
 		return
-	session.advance(delta)
-	clock += delta
-	var public: Dictionary = session.public_snapshot()
-	if public.phase == "route_error":
-		api.fail("voice_route", str(public.error))
-		running = false
-		return
-	if public.phase == "finished":
-		_send_snapshots()
-		_finish(public)
-	elif clock >= 0.25:
-		clock = 0.0
-		_send_snapshots()
+	if api.is_host():
+		session.advance(delta)
+		var public: Dictionary = session.public_snapshot()
+		if public.phase == "route_error":
+			running = false
+			api.fail("voice_route", str(public.error))
+			return
+		_publish_changes()
+		if not running:
+			return
+		if public.phase == "finished":
+			_finish(public)
+	if not snapshot.is_empty():
+		_render()
 
-## Acknowledgement means the host routing API accepted the policy, not device audibility.
 func _route_voice(command: Dictionary) -> void:
 	var error: Error = OK
 	match command.action:
@@ -146,12 +150,41 @@ func _acknowledge_route(command_id: int, run_id: int, error: Error) -> void:
 	if running:
 		session.acknowledge_voice(command_id, run_id, error == OK, error_string(error))
 
-func _send_snapshots() -> void:
-	for player: Dictionary in api.get_room_players():
+func _publish_changes() -> void:
+	var public: Dictionary = session.public_snapshot()
+	var key: String = "%s/%s/%s" % [public.run_id, public.round_index, public.phase]
+	if key != _phase_key:
+		_phase_key = key
+		_end_msec = api.net.host_time_msec() + roundi(float(public.remaining_seconds) * 1000.0) if public.phase == "playing" else -1
+	var phase_data: Dictionary = {"run_id": public.run_id, "round_index": public.round_index,
+		"phase": public.phase, "round_count": public.round_count, "end_msec": _end_msec}
+	if phase_data != _published_public:
+		var error: Error = api.net.broadcast(&"phase", phase_data)
+		if error != OK:
+			running = false
+			api.fail("phase_send_failed", error_string(error))
+			return
+		_published_public = phase_data
+	for player: Dictionary in players:
 		if not player.connected:
 			continue
-		var value: Dictionary = session.private_snapshot(player.player_id) if _participant(player.player_id) else session.public_snapshot()
-		api.net.send_to_player(player.player_id, &"view", value)
+		var source: Dictionary = session.private_snapshot(player.player_id)
+		var personal: Dictionary = {}
+		for field: String in ["self_choice", "opponent_id", "can_submit", "connected"]:
+			personal[field] = source[field]
+		var previous: Dictionary = _published_private.get(player.player_id, {})
+		var changed: Dictionary = {}
+		for field: String in personal:
+			if not previous.has(field) or previous[field] != personal[field]:
+				changed[field] = personal[field]
+		if changed.is_empty():
+			continue
+		var error: Error = api.net.send_to_player(player.player_id, &"choice_state", changed)
+		if error != OK:
+			running = false
+			api.fail("choice_state_failed", error_string(error))
+			return
+		_published_private[player.player_id] = personal
 
 func _participant(id: String) -> bool:
 	for player: Dictionary in players:
@@ -160,17 +193,35 @@ func _participant(id: String) -> bool:
 	return false
 
 func _choose(choice: String) -> void:
-	if not running or api.input.input_blocked or local_id.is_empty() or not snapshot.get("can_submit", false):
+	if not running or _choice_pending or api.input.input_blocked or local_id.is_empty() or not snapshot.get("can_submit", false):
 		return
-	api.net.send_to_host(&"choice", {"choice": choice, "run_id": snapshot.run_id, "round_index": snapshot.round_index})
+	_choice_pending = true
+	var error: Error = api.net.send_to_host(&"choice", {"choice": choice, "run_id": snapshot.run_id, "round_index": snapshot.round_index})
+	if error != OK:
+		running = false
+		api.fail("choice_send_failed", error_string(error))
+		return
 	cooperate_button.disabled = true
 	defect_button.disabled = true
 
 func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 	if not running or not payload is Dictionary:
 		return
-	if topic == &"view" and int(sender.get("peer_id", 0)) == 1:
-		snapshot = payload
+	if topic in [&"phase", &"choice_state"] and int(sender.get("peer_id", 0)) == 1:
+		if topic == &"phase":
+			if not payload.get("run_id") is int or not payload.get("round_index") is int or not payload.get("round_count") is int or not payload.get("phase") is String or not payload.get("end_msec") is int:
+				return
+			_choice_pending = false
+			snapshot["can_submit"] = false
+		else:
+			for key: String in payload:
+				if key in ["can_submit", "connected"]:
+					if not payload[key] is bool:
+						return
+				elif key not in ["self_choice", "opponent_id"] or not payload[key] is String:
+					return
+			_choice_pending = false
+		snapshot.merge(payload, true)
 		_render()
 	elif topic == &"choice" and api.is_host():
 		if not payload.get("run_id") is int or not payload.get("round_index") is int or payload.get("choice") not in ["cooperate", "defect"]:
@@ -178,16 +229,16 @@ func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 		for player: Dictionary in api.get_players():
 			if player.connected and player.player_id in sender.get("player_ids", []):
 				session.submit_choice(player.player_id, payload.run_id, payload.round_index, payload.choice)
-				_send_snapshots()
+				_publish_changes()
 				break
 
 func _render() -> void:
-	status_label.text = api.i18n.text(&"hud.round", {"round": int(snapshot.get("round_index", -1)) + 1, "total": snapshot.get("round_count", 0), "time": ceili(snapshot.get("remaining_seconds", 0)), "spectator": " · 观战" if local_id.is_empty() else ""})
+	status_label.text = api.i18n.text(&"hud.round", {"round": int(snapshot.get("round_index", -1)) + 1, "total": snapshot.get("round_count", 0), "time": ceili(maxf(0.0, float(snapshot.end_msec - api.net.host_time_msec()) / 1000.0)), "spectator": " · 观战" if local_id.is_empty() else ""})
 	var opponent: String = str(snapshot.get("opponent_id", ""))
 	detail_label.text = "本轮轮空，等待其他配对" if opponent.is_empty() else api.i18n.text(&"hud.partner", {"player": _name(opponent)})
 	if not str(snapshot.get("self_choice", "")).is_empty():
 		detail_label.text += " · 已锁定：" + ("合作" if snapshot.self_choice == "cooperate" else "背叛")
-	cooperate_button.disabled = not snapshot.get("can_submit", false)
+	cooperate_button.disabled = _choice_pending or not snapshot.get("can_submit", false)
 	defect_button.disabled = cooperate_button.disabled
 
 func _name(id: String) -> String:
