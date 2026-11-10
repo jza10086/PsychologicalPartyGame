@@ -3,7 +3,7 @@ extends RefCounted
 ## Call from one host thread; snapshots are detached copies, never raw state.
 signal changed
 signal voice_requested(command: Dictionary)
-const Rules: Script = preload("res://games/minigame/godot_party_default_psychological_party/core/rules.gd")
+const Rules: Script = preload("res://games/minigame/gp_psych_party/core/rules.gd")
 const VOICE_ACK_TIMEOUT: float = 5.0
 var _run_id: int = 0
 var _command_id: int = 0

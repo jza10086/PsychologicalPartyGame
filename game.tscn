@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_psychological_party/game.gd" id="1_gict7"]
+[ext_resource type="Script" path="res://games/minigame/gp_psych_party/game.gd" id="1_gict7"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gict7"]
 bg_color = Color(0.105882354, 0.22352941, 0.27058825, 1)

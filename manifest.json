@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "core_api_major": 5,
-  "package_version": "1.0.7",
-  "id": "godot_party_default_psychological_party",
+  "package_version": "1.0.8",
+  "id": "gp_psych_party",
   "name": "GodotPartyDefault · 心理博弈",
   "kind": "minigame",
   "supported_systems": ["windows"],

@@ -1,4 +1,4 @@
-# godot_party_default_psychological_party 许可范围
+# gp_psych_party 许可范围
 
 声明日期：2026-11-08；声明人：项目所有者 jza10086。依据项目所有者本次明确授权。
 
