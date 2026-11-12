@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://games/minigame/gp_psych_party/ui/briefing.tscn" id="briefing"]
+[ext_resource type="PackedScene" path="res://games/minigame/gp_psych_party/ui/settlement.tscn" id="settlement"]
+[ext_resource type="Script" path="res://games/protocols/godot_party_default_protocol/round_pages.gd" id="pages"]
+
+[node name="ProtocolPages" type="CanvasLayer" node_paths=PackedStringArray("briefing", "settlement")]
+process_mode = 3
+layer = 32
+script = ExtResource("pages")
+briefing = NodePath("Briefing")
+settlement = NodePath("Settlement")
+
+[node name="Briefing" parent="." instance=ExtResource("briefing")]
+visible = false
+
+[node name="Settlement" parent="." instance=ExtResource("settlement")]
+visible = false

@@ -1,5 +1,7 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://games/minigame/gp_psych_party/ui/round_pages.tscn" id="protocol_pages"]
+
 [ext_resource type="Script" path="res://games/minigame/gp_psych_party/game.gd" id="1_gict7"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gict7"]
@@ -55,7 +57,8 @@ corner_radius_bottom_right = 52
 corner_radius_bottom_left = 52
 corner_detail = 20
 
-[node name="Game" type="Control" unique_id=297047006]
+[node name="Game" type="Control" unique_id=297047006 node_paths=PackedStringArray("pages")]
+pages = NodePath("ProtocolPages")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -280,3 +283,6 @@ text = "合作 / 合作：3 / 3 · 背叛 / 合作：5 / 0
 背叛 / 背叛：1 / 1 · 超时默认背叛
 Esc：菜单"
 horizontal_alignment = 2
+
+[node name="ProtocolPages" parent="." instance=ExtResource("protocol_pages")]
+unique_name_in_owner = true

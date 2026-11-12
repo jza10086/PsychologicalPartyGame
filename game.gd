@@ -2,7 +2,7 @@ extends Control
 ## Host rules and pair voice routing; reliable phase and owner-only choice changes.
 const Session: Script = preload("res://games/minigame/gp_psych_party/core/session.gd")
 const Pages = preload("res://games/protocols/godot_party_default_protocol/round_pages.gd")
-var pages: Pages
+@export var pages: Pages
 var api: PartyAPI
 var request: Dictionary
 var players: Array[Dictionary] = []
@@ -64,7 +64,7 @@ func _ready() -> void:
 	if api.is_host():
 		session = Session.new()
 		session.voice_requested.connect(_route_voice)
-	pages = Pages.new()
+	assert(pages != null, "Assign ProtocolPages in the game scene")
 	var ready_error: Error = pages.prepare(self, api, request, _start_gameplay)
 	if ready_error != OK:
 		api.fail("load_failed", error_string(ready_error))
