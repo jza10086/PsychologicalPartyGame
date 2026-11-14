@@ -11,3 +11,9 @@
 只支持 standard 普通局。使用 temp_game/PsychologicalPartyGame 的排程、收益和权威状态机，替换 demo 本地视角切换和 mock_voice_router；不读取原型测试身份或虚构网络保密。
 
 与本轮搭档商议后分别选择行动，根据双方的选择累计收益，最终按总收益排名。
+
+## 包内开发文档
+
+未带 `res://` 的源码路径以本包根目录为基准。
+
+- [M20 心理博弈　A/B　依赖 G01](gp_psych_party_development.md)
