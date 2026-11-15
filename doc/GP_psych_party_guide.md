@@ -16,4 +16,4 @@
 
 未带 `res://` 的源码路径以本包根目录为基准。
 
-- [M20 心理博弈　A/B　依赖 G01](gp_psych_party_development.md)
+- [M20 心理博弈　A/B　依赖 G01](GP_psych_party_development.md)

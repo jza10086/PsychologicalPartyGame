@@ -1,8 +1,8 @@
 extends Control
 
 ## Host rules and pair voice routing; reliable phase and owner-only choice changes.
-const Session: Script = preload("res://games/minigame/gp_psych_party/core/session.gd")
-const Pages = preload("res://games/protocols/godot_party_default_protocol/round_pages.gd")
+const Session: Script = preload("res://games/minigame/GP_psych_party/core/session.gd")
+const Pages = preload("res://games/protocols/GP_default_protocol/round_pages.gd")
 @export var pages: Pages
 var api: PartyAPI
 var request: Dictionary

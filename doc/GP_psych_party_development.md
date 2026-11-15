@@ -2,10 +2,10 @@
 
 来源：2026-11-07 架构审查及其最后实施记录。整理日期：2026-11-14。下列待办保留原状态；实施前核对本包源码与工作区，不以历史检查代替本次验收。
 
-[共享 G01–G03 任务](../../../protocols/godot_party_default_protocol/doc/godot_party_default_protocol_development.md) · [包说明](gp_psych_party_guide.md)
+[共享 G01–G03 任务](../../../protocols/GP_default_protocol/doc/GP_default_protocol_development.md) · [包说明](GP_psych_party_guide.md)
 
 
-包：`gp_psych_party`。定位：[game.gd](../game.gd) 的 `_choose()`、`_send_snapshots()`、`_toggle_microphone()`、`party_stop()`。
+包：`GP_psych_party`。定位：[game.gd](../game.gd) 的 `_choose()`、`_send_snapshots()`、`_toggle_microphone()`、`party_stop()`。
 
 - [ ] `_choose()` 当前发送后直接禁用选择按钮，未检查 Error；处理失败后才决定锁定。逐人快照发送也不能忽略返回值。
 - [ ] 麦克风按钮加入明确的正式生命周期/菜单门控。停止时检查端点/路由关闭结果、解除连接，保证作用域总线清理顺序；重复停止不能误操作其它作用域。

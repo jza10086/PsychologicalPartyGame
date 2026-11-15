@@ -21,3 +21,6 @@ msgstr "第 {round} / {total} 轮 · 剩余 {time} 秒{spectator}"
 
 msgid "hud.partner"
 msgstr "当前搭档：{player}"
+
+msgid "package.name"
+msgstr "GodotPartyDefault · 心理博弈"

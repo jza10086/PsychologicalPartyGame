@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="PackedScene" path="res://games/protocols/godot_party_default_protocol/briefing/briefing_page.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://games/protocols/GP_default_protocol/briefing/briefing_page.tscn" id="1"]
 
 [node name="Briefing" instance=ExtResource("1")]
 
