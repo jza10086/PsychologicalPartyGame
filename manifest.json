@@ -1,13 +1,13 @@
 {
   "id": "GP_psych_party",
   "kind": "minigame",
-  "package_version": "0.0.9",
+  "package_version": "0.0.10",
   "framework_version": "0.6.0",
   "remark": "",
   "supported_languages": [
     "zh-CN"
   ],
   "dependencies": {
-    "GP_default_protocol": "~0.4.0"
+    "GP_default_protocol": "~0.4.1"
   }
 }
